@@ -19,7 +19,7 @@ api = Api(
 
 ocr_model = LatexOCR()
 
-app.run(host="0.0.0.0", port=5000, debug=True)
+ns = app.run(host="0.0.0.0", port=5000, debug=True)
 
 file_upload_parser = reqparse.RequestParser()
 file_upload_parser.add_argument(
