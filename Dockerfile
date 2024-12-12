@@ -7,11 +7,13 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Expose the Flask app's port
+EXPOSE 5000
+
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the Flask app's port
-EXPOSE 5000
+
 
 # Set environment variables for Flask
 ENV FLASK_APP=app.py
