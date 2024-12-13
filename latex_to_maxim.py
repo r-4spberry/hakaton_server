@@ -65,9 +65,10 @@ def sympy_to_custom(expr):
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = r"\lim_{x\to\infty} f(x)"  # Replace with your LaTeX input
-    sympy_expr = parse_latex(latex_input)
-    grammar_expr = sympy_to_custom(sympy_expr)
+    latex_input = "\\frac"  # Replace with your LaTeX input
+    sympy_to_custom(parse_latex(latex_input))
+    # sympy_expr = parse_latex(latex_input)
+    # grammar_expr = sympy_to_custom(sympy_expr)
 
-    print("SymPy Expression:", sympy_expr)
-    print("Custom Grammar Format:", grammar_expr)
+    # print("SymPy Expression:", sympy_expr)
+    # print("Custom Grammar Format:", grammar_expr)

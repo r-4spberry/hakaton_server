@@ -53,6 +53,7 @@ class Compare(Resource):
             return {"error": "Missing LaTeX strings"}, 400
         latex1 = data["latex1"]
         latex2 = data["latex2"]
+        print(f"{latex1=}, {latex2=}")
         try:
             try:
                 latex1_transformed = sympy_to_custom(parse_latex(latex1))
