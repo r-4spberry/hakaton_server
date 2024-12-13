@@ -9,6 +9,9 @@ from pix2tex.cli import LatexOCR
 import tempfile
 from werkzeug.datastructures import FileStorage
 from flask_cors import CORS
+from latex_to_maxim import sympy_to_custom
+from sympy.parsing.latex import parse_latex
+from sympy.parsing.latex.errors import LaTeXParsingError
 
 app = Flask(__name__)
 CORS(app)
@@ -50,7 +53,20 @@ class Compare(Resource):
             return {"error": "Missing LaTeX strings"}, 400
         latex1 = data["latex1"]
         latex2 = data["latex2"]
-        similarity = SequenceMatcher(None, latex1, latex2).ratio() * 100
+        try:
+            try:
+                latex1_transformed = sympy_to_custom(parse_latex(latex1))
+            except ValueError or LaTeXParsingError as e:
+                return {"error": f"latex1: {str(e)}"}, 409
+            try:
+                latex2_transformed = sympy_to_custom(parse_latex(latex2))
+            except ValueError or LaTeXParsingError as e:
+                return {"error": f"latex2: {str(e)}"}, 409
+        except Exception as e:
+            return {"error": str(e)}, 500
+        similarity = (
+            SequenceMatcher(None, latex1_transformed, latex2_transformed).ratio() * 100
+        )
         return {"similarity": f"{similarity:.2f}%"}
 
 
@@ -70,7 +86,11 @@ class Operations(Resource):
                 "sqrt",
                 "sum",
                 "int",
-                "lim",
+                "left",
+                "right",
+                "cdot",
+                "times",
+                "log",
             ]
         }
 
