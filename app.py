@@ -9,7 +9,7 @@ from pix2tex.cli import LatexOCR
 import tempfile
 from werkzeug.datastructures import FileStorage
 from flask_cors import CORS
-from latex_to_maxim import sympy_to_custom
+from latex_to_maxim import latex_to_custom
 from sympy.parsing.latex import parse_latex
 from sympy.parsing.latex.errors import LaTeXParsingError
 
@@ -56,11 +56,11 @@ class Compare(Resource):
         print(f"{latex1=}, {latex2=}")
         try:
             try:
-                latex1_transformed = sympy_to_custom(parse_latex(latex1))
+                latex1_transformed = latex_to_custom(latex1)
             except ValueError or LaTeXParsingError as e:
                 return {"error": f"latex1: {str(e)}"}, 409
             try:
-                latex2_transformed = sympy_to_custom(parse_latex(latex2))
+                latex2_transformed = latex_to_custom(latex2)
             except ValueError or LaTeXParsingError as e:
                 return {"error": f"latex2: {str(e)}"}, 409
         except Exception as e:
@@ -149,7 +149,7 @@ class PixToTex(Resource):
             return {"error": str(e)}, 500
 
         try:
-            converted = sympy_to_custom(parse_latex(latex_formula))
+            converted = latex_to_custom(latex_formula)
         except Exception as e:
             os.remove(file_path)
             return {
