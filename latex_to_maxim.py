@@ -1,6 +1,15 @@
 from sympy.parsing.latex import parse_latex
-from sympy import symbols, Add, Mul, Pow, Integral, log
+from sympy import symbols, Add, Mul, Pow, Integral, log, Eq
 from sympy import E, Pow
+
+def transform_equals_to_minus(sympy_expr):
+    """Transform '=' in a SymPy expression to '-'."""
+    # If the expression is an equation like a = b, replace the Eq() with a subtraction
+    if isinstance(sympy_expr, Eq):
+        lhs = sympy_expr.lhs
+        rhs = sympy_expr.rhs
+        return lhs - rhs
+    return sympy_expr
 
 
 def sympy_to_custom(expr):
@@ -65,10 +74,10 @@ def sympy_to_custom(expr):
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = "\\frac"  # Replace with your LaTeX input
-    sympy_to_custom(parse_latex(latex_input))
-    # sympy_expr = parse_latex(latex_input)
-    # grammar_expr = sympy_to_custom(sympy_expr)
+    latex_input = r"x_{1}={\frac{-b+{\sqrt{D}}}{2a}}"  # Replace with your LaTeX input
+    # sympy_to_custom(parse_latex(latex_input))
+    sympy_expr = transform_equals_to_minus(parse_latex(latex_input))
+    grammar_expr = sympy_to_custom(sympy_expr)
 
-    # print("SymPy Expression:", sympy_expr)
-    # print("Custom Grammar Format:", grammar_expr)
+    print("SymPy Expression:", sympy_expr)
+    print("Custom Grammar Format:", grammar_expr)
