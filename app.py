@@ -68,7 +68,7 @@ class Compare(Resource):
         similarity = (
             SequenceMatcher(None, latex1_transformed, latex2_transformed).ratio() * 100
         )
-        return {"similarity": f"{similarity:.2f}%"}
+        return {"similarity": f"{similarity:.2f}%", "latex1": latex1, "latex2": latex2}
 
 
 @ns.route("/operations")

@@ -76,13 +76,16 @@ def sympy_to_custom(expr):
 
 def latex_to_custom(latex):
     cleaned_string = re.sub(r"\\mathrm{(.*?)}", r"\1", latex)
+    cleaned_string = re.sub(r"{\\bf\s*([a-zA-Z])}", r"\1", cleaned_string)  # Handles {\bf ...}
+    cleaned_string = re.sub(r"\\bf\s*([a-zA-Z])", r"\1", cleaned_string)  # Handles \bf ...
+
     sympy_expr = transform_equals_to_minus(parse_latex(cleaned_string))
     return sympy_to_custom(sympy_expr)
 
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = r"{\mathrm{M}_{1}}"  # Replace with your LaTeX input
+    latex_input = "\\frac{\\mathrm{M}_{1}{\\bf b}_{1}{\\bf T}_{1}}{\\mathrm{W}_{1}}=\\frac{\\mathrm{M}_{2}{\\bf D}_{2}{\\bf T}_{2}}{\\mathrm{W}_{2}}"  # Replace with your LaTeX input
     # sympy_to_custom(parse_latex(latex_input))
     sympy_expr = latex_to_custom(latex_input)
 
