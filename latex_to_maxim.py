@@ -1,3 +1,4 @@
+import re
 from sympy.parsing.latex import parse_latex
 from sympy import symbols, Add, Mul, Pow, Integral, log, Eq
 from sympy import E, Pow
@@ -74,13 +75,14 @@ def sympy_to_custom(expr):
 
 
 def latex_to_custom(latex):
-    sympy_expr = transform_equals_to_minus(parse_latex(latex))
+    cleaned_string = re.sub(r"\\mathrm{(.*?)}", r"\1", latex)
+    sympy_expr = transform_equals_to_minus(parse_latex(cleaned_string))
     return sympy_to_custom(sympy_expr)
 
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = r"a-b"  # Replace with your LaTeX input
+    latex_input = r"{\mathrm{M}_{1}}"  # Replace with your LaTeX input
     # sympy_to_custom(parse_latex(latex_input))
     sympy_expr = latex_to_custom(latex_input)
 
