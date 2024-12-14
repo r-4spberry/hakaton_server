@@ -148,6 +148,14 @@ class PixToTex(Resource):
             os.remove(file_path)
             return {"error": str(e)}, 500
 
+        try:
+            converted = sympy_to_custom(parse_latex(latex_formula))
+        except Exception as e:
+            os.remove(file_path)
+            return {
+                "error": f"couldn't parse the string {latex_formula}, {str(e)}"
+            }, 409
+
         os.remove(file_path)
         return {"formulas": extracted_formulas}
 
