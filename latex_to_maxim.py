@@ -1,6 +1,6 @@
 import re
 from sympy.parsing.latex import parse_latex
-from sympy import symbols, Add, Mul, Pow, Integral, log, Eq
+from sympy import Rational, symbols, Add, Mul, Pow, Integral, log, Eq
 from sympy import E, Pow
 
 def transform_equals_to_minus(sympy_expr):
@@ -18,6 +18,9 @@ def sympy_to_custom(expr):
     Recursively converts a SymPy expression into your custom grammar format.
     """
     if expr.is_Number:
+        if isinstance(expr, Rational):
+            # Represent rationals using div(num(a), num(b))
+            return f"div(num({expr.p}), num({expr.q}))"
         return f"num({expr})"
     elif expr.is_Symbol:
         return f"var({expr})"
@@ -158,10 +161,10 @@ def split_arguments(arguments):
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = "\\frac{\\mathrm{M}_{1}{\\bf b}_{1}{\\bf T}_{1}}{\\mathrm{W}_{1}}=\\frac{\\mathrm{M}_{2}{\\bf D}_{2}{\\bf T}_{2}}{\\mathrm{W}_{2}}"  # Replace with your LaTeX input
+    latex_input = "\\sqrt{a}"  # Replace with your LaTeX input
     # sympy_to_custom(parse_latex(latex_input))
     sympy_expr = latex_to_custom(latex_input)
-
+    print(parse_latex(latex_input))
     print("SymPy Expression:", sympy_expr)
     print("Custom Grammar Format:", sympy_expr)
     print("Reversed latex:", custom_to_latex(sympy_expr))
