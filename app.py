@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_restx import Api, Resource, fields, reqparse
-from difflib import SequenceMatcher
 import os
 from PyPDF2 import PdfReader
 import torch
@@ -9,14 +8,22 @@ from pix2tex.cli import LatexOCR
 import tempfile
 from werkzeug.datastructures import FileStorage
 from flask_cors import CORS
-from latex_to_maxim import latex_to_custom, custom_to_latex
-from sympy.parsing.latex import parse_latex
+from latex_to_custom import latex_to_custom, custom_to_latex
 from sympy.parsing.latex.errors import LaTeXParsingError
 import sys
 import time
 import logging
 from flask.logging import default_handler
-from flask import render_template_string
+from flask import (
+    render_template_string,
+    Response,
+    request,
+    make_response,
+    render_template_string,
+)
+from functools import wraps
+from dotenv import load_dotenv
+import os
 
 sys.path.append(os.path.abspath("expressionChecker/src"))
 from expressionchecker import ExpressionChecker
@@ -82,6 +89,7 @@ class Compare(Resource):
         logger.info(f"Received comparison request: {latex1=} {latex2=}")
 
         try:
+            # Transform latex to cutom grammar
             try:
                 latex1_transformed = latex_to_custom(latex1)
                 logger.debug(f"Transformed latex1: {latex1_transformed}")
@@ -106,6 +114,7 @@ class Compare(Resource):
         ec = ExpressionChecker(latex1_transformed, latex2_transformed, True)
         logger.info("Initialized ExpressionChecker.")
 
+        # Check custom grammar strings with ExpressionChecker
         try:
             run = ec.search(numIter)
 
@@ -139,11 +148,6 @@ class Compare(Resource):
             logger.exception("Error during comparison execution.")
             return {"error": str(e)}, 500
 
-
-from flask import Response, request, make_response, render_template_string
-from functools import wraps
-from dotenv import load_dotenv
-import os
 
 # Load environment variables
 load_dotenv()

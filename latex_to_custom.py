@@ -20,8 +20,10 @@ def sympy_to_custom(expr):
     """
     if expr.is_Number:
         if isinstance(expr, Rational):
-            # Represent rationals using div(num(a), num(b))
-            return f"div(num({expr.p}), num({expr.q}))"
+            # Represent rationals using fraq(num(p), num(q)) except of when b = 1
+            if expr.q == 1:
+                return f"num({expr.p})"
+            return f"fraq(num({expr.p}), num({expr.q}))"
         return f"num({expr})"
     elif expr.is_Symbol:
         return f"var({expr})"
@@ -162,7 +164,7 @@ def split_arguments(arguments):
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = "\\sqrt{a}"  # Replace with your LaTeX input
+    latex_input = "f(5)"  # Replace with your LaTeX input
     # sympy_to_custom(parse_latex(latex_input))
     sympy_expr = latex_to_custom(latex_input)
     print(parse_latex(latex_input))
