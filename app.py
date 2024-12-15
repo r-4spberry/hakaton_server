@@ -264,21 +264,13 @@ class Operations(Resource):
         logger.info("Requested list of supported LaTeX operations.")
         return {
             "latex_operations": [
-                "frac",
-                "+",
-                "-",
-                "*",
-                "/",
-                "^",
-                "_",
-                "sqrt",
-                "sum",
-                "int",
-                "left",
-                "right",
-                "cdot",
-                "times",
-                "log",
+                {"label": "a //times b", "latex": "//times"},
+                {"label": "//frac{a}{b}", "latex": "//frac{}{}"},
+                {"label": "a //cdot b", "latex": "//cdot"},
+                {"label": "//sqrt{a}", "latex": "//sqrt{}"},
+                {"label": "//left(a)//right", "latex": "//left()//right"},
+                {"label": "a_b", "latex": "_"},
+                {"label": "a^b", "latex": "^"},
             ]
         }
 
