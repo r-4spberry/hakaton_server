@@ -3,7 +3,6 @@ from sympy.parsing.latex import parse_latex
 from sympy import symbols, Add, Mul, Pow, Integral, log, Eq
 from sympy import E, Pow
 
-
 def transform_equals_to_minus(sympy_expr):
     """Transform '=' in a SymPy expression to '-'."""
     # If the expression is an equation like a = b, replace the Eq() with a subtraction
@@ -76,11 +75,85 @@ def sympy_to_custom(expr):
 
 def latex_to_custom(latex):
     cleaned_string = re.sub(r"\\mathrm{(.*?)}", r"\1", latex)
-    cleaned_string = re.sub(r"{\\bf\s*([a-zA-Z])}", r"\1", cleaned_string)  # Handles {\bf ...}
-    cleaned_string = re.sub(r"\\bf\s*([a-zA-Z])", r"\1", cleaned_string)  # Handles \bf ...
+    cleaned_string = re.sub(
+        r"{\\bf\s*([a-zA-Z])}", r"\1", cleaned_string
+    )  # Handles {\bf ...}
+    cleaned_string = re.sub(
+        r"\\bf\s*([a-zA-Z])", r"\1", cleaned_string
+    )  # Handles \bf ...
 
     sympy_expr = transform_equals_to_minus(parse_latex(cleaned_string))
     return sympy_to_custom(sympy_expr)
+
+
+def custom_to_latex(expression):
+    """Convert custom grammar-like expressions to LaTeX."""
+    # Base cases for different elements
+    if expression.startswith("var("):
+        # Extract variable name inside var()
+        return re.search(r"var\((.*?)\)", expression).group(1)
+    if expression.startswith("num("):
+        # Extract numeric value inside num()
+        return re.search(r"num\((.*?)\)", expression).group(1)
+    if expression.startswith("mul("):
+        # Handle multiplication: mul(a, b) -> "a \cdot b"
+        inner = re.search(r"mul\((.*)\)", expression).group(1)
+        terms = split_arguments(inner)
+        return " \\cdot ".join(custom_to_latex(term) for term in terms)
+    if expression.startswith("sum("):
+        # Handle summation: sum(a, b) -> "a + b"
+        inner = re.search(r"sum\((.*)\)", expression).group(1)
+        terms = split_arguments(inner)
+        return " + ".join(custom_to_latex(term) for term in terms)
+    if expression.startswith("sub("):
+        # Handle subtraction: sub(a, b) -> "a - b"
+        inner = re.search(r"sub\((.*)\)", expression).group(1)
+        minuend, subtrahend = split_arguments(inner)
+        return f"{custom_to_latex(minuend)} - {custom_to_latex(subtrahend)}"
+    if expression.startswith("fraq("):
+        # Handle fraction: fraq(a, b) -> "\frac{a}{b}"
+        inner = re.search(r"fraq\((.*)\)", expression).group(1)
+        numerator, denominator = split_arguments(inner)
+        return (
+            f"\\frac{{{custom_to_latex(numerator)}}}{{{custom_to_latex(denominator)}}}"
+        )
+    if expression.startswith("pow("):
+        # Handle power: pow(a, b) -> "a^{b}"
+        inner = re.search(r"pow\((.*)\)", expression).group(1)
+        base, exponent = split_arguments(inner)
+        return f"{custom_to_latex(base)}^{{{custom_to_latex(exponent)}}}"
+    if expression.startswith("integral("):
+        # Handle integral: integral(a, b, c) -> "\int_{b}^{c} a \,dx"
+        inner = re.search(r"integral\((.*)\)", expression).group(1)
+        integrand, lower, upper = split_arguments(inner)
+        return f"\\int_{{{custom_to_latex(lower)}}}^{{{custom_to_latex(upper)}}} {custom_to_latex(integrand)} \\,dx"
+    if expression.startswith("log("):
+        # Handle logarithm: log(a, b) -> "\log_{b}(a)"
+        inner = re.search(r"log\((.*)\)", expression).group(1)
+        value, base = split_arguments(inner)
+        return f"\\log_{{{custom_to_latex(base)}}}({custom_to_latex(value)})"
+    # Default case (should not happen for valid input)
+    return expression
+
+
+def split_arguments(arguments):
+    """Split arguments in a custom expression, respecting nested parentheses."""
+    result = []
+    balance = 0
+    current = []
+    for char in arguments:
+        if char == "," and balance == 0:
+            result.append("".join(current).strip())
+            current = []
+        else:
+            if char == "(":
+                balance += 1
+            elif char == ")":
+                balance -= 1
+            current.append(char)
+    if current:
+        result.append("".join(current).strip())
+    return result
 
 
 # Example usage
@@ -91,3 +164,4 @@ if __name__ == "__main__":
 
     print("SymPy Expression:", sympy_expr)
     print("Custom Grammar Format:", sympy_expr)
+    print("Reversed latex:", custom_to_latex(sympy_expr))
