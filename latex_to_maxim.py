@@ -3,6 +3,7 @@ from sympy.parsing.latex import parse_latex
 from sympy import Rational, symbols, Add, Mul, Pow, Integral, log, Eq
 from sympy import E, Pow
 
+
 def transform_equals_to_minus(sympy_expr):
     """Transform '=' in a SymPy expression to '-'."""
     # If the expression is an equation like a = b, replace the Eq() with a subtraction
