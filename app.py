@@ -39,7 +39,7 @@ app.logger.setLevel(logging.DEBUG)
 # Use Flask's logger for custom logs
 logger = app.logger
 
-TIMEOUT = 1000
+TIMEOUT = 10000
 
 api = Api(
     app,
@@ -100,7 +100,7 @@ class Compare(Resource):
             logger.exception("Unexpected error during transformation.")
             return {"error": str(e)}, 500
 
-        numIter = 100000
+        numIter = 1000
         timer_start = time.perf_counter_ns()
 
         ec = ExpressionChecker(latex1_transformed, latex2_transformed)
@@ -150,6 +150,7 @@ load_dotenv()
 USERNAME = os.getenv("LOGS_USERNAME", "admin")
 PASSWORD = os.getenv("LOGS_PASSWORD", "secret")
 
+
 # Authentication decorator
 def requires_auth(username, password):
     def decorator(f):
@@ -161,14 +162,17 @@ def requires_auth(username, password):
                 response.headers["WWW-Authenticate"] = 'Basic realm="Login Required"'
                 return response
             return f(*args, **kwargs)
+
         return wrapper
+
     return decorator
+
 
 @ns.route("/logs/pretty")
 class PrettyLogs(Resource):
     def output_html(self, data, code, headers=None):
         """Helper to return HTML response."""
-        resp = Response(data, mimetype='text/html', headers=headers)
+        resp = Response(data, mimetype="text/html", headers=headers)
         resp.status_code = code
         return resp
 
@@ -183,24 +187,28 @@ class PrettyLogs(Resource):
                     parts = line.split(" - ", 2)
                     if len(parts) == 3:
                         timestamp, levelname, message = parts
-                        logs.append({
-                            "timestamp": timestamp.strip(),
-                            "levelname": levelname.strip(),
-                            "message": message.strip(),
-                        })
+                        logs.append(
+                            {
+                                "timestamp": timestamp.strip(),
+                                "levelname": levelname.strip(),
+                                "message": message.strip(),
+                            }
+                        )
                     else:
-                        logs.append({
-                            "timestamp": "Unknown",
-                            "levelname": "unknown",
-                            "message": line.strip(),
-                        })
+                        logs.append(
+                            {
+                                "timestamp": "Unknown",
+                                "levelname": "unknown",
+                                "message": line.strip(),
+                            }
+                        )
             response = render_template_string(
                 """
                 <!DOCTYPE html>
                 <html lang="en">
                 <head>
                     <meta charset="UTF-8">
-                    <meta http-equiv="refresh" content="5">
+                    <meta http-equiv="refresh" content="20">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Application Logs</title>
                     <style>
@@ -227,13 +235,12 @@ class PrettyLogs(Resource):
                 </body>
                 </html>
                 """,
-                logs=logs
+                logs=logs,
             )
             return self.output_html(response, 200)
         except Exception as e:
             logger.exception("Error rendering pretty logs.")
             return {"error": str(e)}, 500
-
 
 
 @ns.route("/logs")
