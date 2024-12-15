@@ -1,12 +1,18 @@
 #!/bin/bash
 
 # Variables
-REPO_DIR=/app  # Path to your app inside the container
-BRANCH=main    # Git branch to monitor
+REPO_DIR=/app            # Path to your app inside the container
+BRANCH=main              # Git branch to monitor
+APP_COMMAND="python app.py"  # Command to start the app
 
 echo "Starting auto-update script..."
 
 cd $REPO_DIR || exit 1
+
+# Start the application for the first time
+echo "Starting the application for the first time..."
+$APP_COMMAND &  # Start the app in the background
+APP_PID=$!      # Save the app's PID
 
 # Infinite loop to check for updates
 while true; do
@@ -24,9 +30,14 @@ while true; do
         git pull origin $BRANCH
 
         echo "Reloading the application..."
-        # Gracefully restart the app (adjust command as needed)
-        pkill -f "python app.py"  # Stop the app
-        python app.py &           # Restart the app
+        # Stop the current app process
+        kill $APP_PID
+        wait $APP_PID 2>/dev/null
+
+        # Restart the application
+        $APP_COMMAND &
+        APP_PID=$!  # Update the app's PID
+        echo "Application reloaded successfully."
     else
         echo "No updates found. Sleeping..."
     fi
