@@ -270,6 +270,7 @@ class Operations(Resource):
                 {"label": "\\sqrt{a}", "latex": "\\sqrt{}"},
                 {"label": "a_b", "latex": "_{}"},
                 {"label": "a^b", "latex": "^{}"},
+                {"label": "log_a{b}", "latex": "log_{}{}"},
             ]
         }
 
