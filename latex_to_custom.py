@@ -1,6 +1,6 @@
 import re
 from sympy.parsing.latex import parse_latex
-from sympy import Rational, symbols, Add, Mul, Pow, Integral, log, Eq
+from sympy import Function, Rational, symbols, Add, Mul, Pow, Integral, log, Eq
 from sympy import E, Pow
 
 
@@ -20,7 +20,7 @@ def sympy_to_custom(expr):
     """
     if expr.is_Number:
         if isinstance(expr, Rational):
-            # Represent rationals using fraq(num(p), num(q)) except of when b = 1
+            # Represent rationals using fraq(num(p), num(q)) except when denominator is 1
             if expr.q == 1:
                 return f"num({expr.p})"
             return f"fraq(num({expr.p}), num({expr.q}))"
@@ -71,8 +71,12 @@ def sympy_to_custom(expr):
             return f"integral({sympy_to_custom(integrand)}, var(x), var(x))"  # Adjust for indefinite
     elif isinstance(expr, log):
         arg, base = expr.args
-        print(arg, base)
         return f"log({sympy_to_custom(arg)}, {sympy_to_custom(base)})"
+    elif isinstance(expr, Function):
+        # Handle unknown or user-defined functions
+        func_name = expr.func.__name__
+        args = ", ".join(sympy_to_custom(arg) for arg in expr.args)
+        return f"udf({func_name}, {args})"
     elif expr.is_Rational:  # Handle simple fractions
         return f"fraq(num({expr.p}), num({expr.q}))"
     else:
@@ -164,7 +168,7 @@ def split_arguments(arguments):
 
 # Example usage
 if __name__ == "__main__":
-    latex_input = "f(5)"  # Replace with your LaTeX input
+    latex_input = "(5, a+b, c)"  # Replace with your LaTeX input
     # sympy_to_custom(parse_latex(latex_input))
     sympy_expr = latex_to_custom(latex_input)
     print(parse_latex(latex_input))
