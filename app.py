@@ -271,14 +271,12 @@ class Operations(Resource):
                 {"label": "a_b", "latex": "_{}"},
                 {"label": "a^b", "latex": "^{}"},
                 {"label": "log_a{b}", "latex": "log_{}{}"},
-                {"label": "a + b", "latex": "+"},
-                {"label": "a - b", "latex": "-"},
             ]
         }
 
 
 @ns.route("/pdf2latex")
-class PdfToLatex(Resource):al
+class PdfToLatex(Resource):
     @api.expect(file_upload_parser)
     def post(self):
         """Extract LaTeX formulas from a PDF"""
