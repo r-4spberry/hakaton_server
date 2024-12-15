@@ -12,3 +12,4 @@ torchvision==0.18.1+cpu
 antlr4-python3-runtime==4.11.0
 rapidfuzz==3.10.1
 python-dotenv==1.0.1
+lark==1.2.2
