@@ -103,7 +103,7 @@ class Compare(Resource):
         numIter = 1000
         timer_start = time.perf_counter_ns()
 
-        ec = ExpressionChecker(latex1_transformed, latex2_transformed)
+        ec = ExpressionChecker(latex1_transformed, latex2_transformed, True)
         logger.info("Initialized ExpressionChecker.")
 
         try:
