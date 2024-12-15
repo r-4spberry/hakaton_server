@@ -248,73 +248,40 @@ class PrettyLogs(Resource):
             return {"error": str(e)}, 500
 
 
-@ns.route("/logs")
-class Logs(Resource):
-    def get(self):
-        """Serve the latest application logs"""
-        try:
-            with open("app_logs.log", "r") as log_file:
-                logs = log_file.readlines()
-            # Serve the last 100 lines for brevity
-            return {"logs": logs[-100:]}, 200
-        except Exception as e:
-            logger.exception("Error reading log file.")
-            return {"error": str(e)}, 500
+# TODO: make it work
+# @ns.route("/pdf2latex")
+# class PdfToLatex(Resource):
+#     @api.expect(file_upload_parser)
+#     def post(self):
+#         """Extract LaTeX formulas from a PDF"""
+#         args = file_upload_parser.parse_args()
+#         file = args["file"]
+#         if not file:
+#             logger.error("No file provided for PDF to LaTeX conversion.")
+#             return {"error": "No file provided"}, 400
 
+#         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+#             file.save(tmp_file.name)
+#             file_path = tmp_file.name
 
-@ns.route("/operations")
-class Operations(Resource):
-    def get(self):
-        """List all supported LaTeX operations"""
-        logger.info("Requested list of supported LaTeX operations.")
-        return {
-            "latex_operations": [
-                {"label": "a \\times b", "latex": "\\times"},
-                {"label": "\\frac{a}{b}", "latex": "\\frac{}{}"},
-                {"label": "a \\cdot b", "latex": "\\cdot"},
-                {"label": "\\sqrt{a}", "latex": "\\sqrt{}"},
-                {"label": "a_b", "latex": "_{}"},
-                {"label": "a^b", "latex": "^{}"},
-                {"label": "log_a{b}", "latex": "log_{}{}"},
-                {"label": "a + b", "latex": "+"},
-                {"label": "a - b", "latex": "-"},
-            ]
-        }
+#         logger.info(f"Saved uploaded PDF to temporary file: {file_path}")
 
+#         try:
+#             extracted_formulas = []
+#             reader = PdfReader(file_path)
+#             for page in reader.pages:
+#                 text = page.extract_text()
+#                 formulas = [line for line in text.splitlines() if "\\" in line]
+#                 logger.debug(f"Extracted formulas from page: {formulas}")
+#                 extracted_formulas.extend(formulas)
+#         except Exception as e:
+#             logger.exception("Error extracting formulas from PDF.")
+#             os.remove(file_path)
+#             return {"error": str(e)}, 500
 
-@ns.route("/pdf2latex")
-class PdfToLatex(Resource):
-    @api.expect(file_upload_parser)
-    def post(self):
-        """Extract LaTeX formulas from a PDF"""
-        args = file_upload_parser.parse_args()
-        file = args["file"]
-        if not file:
-            logger.error("No file provided for PDF to LaTeX conversion.")
-            return {"error": "No file provided"}, 400
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            file.save(tmp_file.name)
-            file_path = tmp_file.name
-
-        logger.info(f"Saved uploaded PDF to temporary file: {file_path}")
-
-        try:
-            extracted_formulas = []
-            reader = PdfReader(file_path)
-            for page in reader.pages:
-                text = page.extract_text()
-                formulas = [line for line in text.splitlines() if "\\" in line]
-                logger.debug(f"Extracted formulas from page: {formulas}")
-                extracted_formulas.extend(formulas)
-        except Exception as e:
-            logger.exception("Error extracting formulas from PDF.")
-            os.remove(file_path)
-            return {"error": str(e)}, 500
-
-        os.remove(file_path)
-        logger.info("Temporary file removed.")
-        return {"formulas": extracted_formulas}
+#         os.remove(file_path)
+#         logger.info("Temporary file removed.")
+#         return {"formulas": extracted_formulas}
 
 
 @ns.route("/pix2tex")
@@ -336,6 +303,7 @@ class PixToTex(Resource):
 
         try:
             image = Image.open(file_path).convert("RGB")
+            #Process the image
             latex_formula = ocr_model(image)
             logger.debug(f"Extracted LaTeX formula: {latex_formula}")
 
