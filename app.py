@@ -248,7 +248,26 @@ class PrettyLogs(Resource):
             return {"error": str(e)}, 500
 
 
-# TODO: make it work
+@ns.route("/operations")
+class Operations(Resource):
+    def get(self):
+        """List all supported LaTeX operations"""
+        logger.info("Requested list of supported LaTeX operations.")
+        return {
+            "latex_operations": [
+                {"label": "a \\times b", "latex": "\\times"},
+                {"label": "\\frac{a}{b}", "latex": "\\frac{}{}"},
+                {"label": "a \\cdot b", "latex": "\\cdot"},
+                {"label": "\\sqrt{a}", "latex": "\\sqrt{}"},
+                {"label": "a_b", "latex": "_{}"},
+                {"label": "a^b", "latex": "^{}"},
+                {"label": "log_a{b}", "latex": "log_{}{}"},
+                {"label": "a + b", "latex": "+"},
+                {"label": "a - b", "latex": "-"},
+            ]
+        }
+
+
 # @ns.route("/pdf2latex")
 # class PdfToLatex(Resource):
 #     @api.expect(file_upload_parser)
@@ -303,7 +322,6 @@ class PixToTex(Resource):
 
         try:
             image = Image.open(file_path).convert("RGB")
-            #Process the image
             latex_formula = ocr_model(image)
             logger.debug(f"Extracted LaTeX formula: {latex_formula}")
 
