@@ -271,6 +271,8 @@ class Operations(Resource):
                 {"label": "a_b", "latex": "_{}"},
                 {"label": "a^b", "latex": "^{}"},
                 {"label": "log_a{b}", "latex": "log_{}{}"},
+                {"label": "a + b", "latex": "+"},
+                {"label": "a - b", "latex": "-"},
             ]
         }
 
