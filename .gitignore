@@ -1,4 +1,43 @@
-venv/*
-venv
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables
 .env
+
+# Logs
 app_logs.log
+*.log
+
+# Test and temporary files
+.pytest_cache/
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# IDEs and editors
+.vscode/
+.idea/
+*.iml
+
+# Docker-related
+*.dockerfile
+docker-compose.yml
+*.tar
+
+# Dependencies
+*.egg-info/
+dist/
+build/
+
+# Git ignore safety
+.gitignore
